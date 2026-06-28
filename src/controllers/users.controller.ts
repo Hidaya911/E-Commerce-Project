@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import User from "../models/user.model";
+import User from "../models/users.model";
 
 export const createUser = async (
     req: Request,
@@ -14,14 +14,33 @@ export const createUser = async (
     }
 };
 
+//read all users with pagination 
 export const getUsers = async (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
     try {
-        const users = await User.find();
-        res.json(users);
+        // Extract page and limit from query strings, with fallbacks
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const skip = (page - 1) * limit;
+
+        const users = await User.find()
+            .skip(skip)
+            .limit(limit);
+
+        const totalItems = await User.countDocuments();
+
+        res.json({
+            data: users,
+            pagination: {
+                currentPage: page,
+                limit,
+                totalPages: Math.ceil(totalItems / limit),
+                totalItems
+            }
+        });
     } catch (error) {
         next(error);
     }

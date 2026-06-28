@@ -5,9 +5,9 @@ import {
     getUserById,
     updateUser,
     deleteUser
-} from "../controllers/user.controller";
+} from "../controllers/users.controller";
 import { validate } from "../middlewares/validate.middleware";
-import { createUserSchema } from "../validators/user.validator";
+import { createUserSchema } from "../validators/users.validator";
 const router = Router();
 
 router.post("/", validate(createUserSchema), createUser);
